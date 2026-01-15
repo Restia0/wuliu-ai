@@ -32,11 +32,14 @@ class CoreOrder(Base):
     driver_id = Column(BIGINT, ForeignKey("core_user.id", ondelete="SET NULL"), nullable=True, comment="关联司机ID")
     warehouse_id = Column(BIGINT, ForeignKey("core_warehouse.id", ondelete="SET NULL"), nullable=True,
                           comment="关联出库仓库ID")
-    create_user_id = Column(BIGINT, nullable=True, comment="创建人ID")
+    create_user_id = Column(BIGINT, ForeignKey("core_user.id", ondelete="SET NULL"), nullable=True, comment="创建人ID")
     # 时间/删除标记
     create_time = Column(DATETIME, default=func.now(), comment="创建时间")
     update_time = Column(DATETIME, default=func.now(), onupdate=func.now(), comment="更新时间")
     is_delete = Column(TINYINT, default=0, comment="是否删除")
+
+    # 新增反向关联（与CoreUser.created_orders对应）
+    creator = relationship("CoreUser", foreign_keys=[create_user_id], back_populates="created_orders")
 
     # 关联关系
     driver = relationship("CoreUser", foreign_keys=[driver_id], backref="assigned_orders")

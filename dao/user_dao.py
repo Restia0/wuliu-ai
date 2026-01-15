@@ -6,9 +6,9 @@ from sqlalchemy.exc import IntegrityError
 
 class UserDAO(BaseDAO):
     def __init__(self):
-        super.__init__(CoreUser)
+        super().__init__(CoreUser)
 
-    def create_user(self, user_data: dict) -> CoreUser:
+    def create_user(self, user_data: dict) -> dict:
         """
         创建用户（加密密码）
         :param user_data:
@@ -18,7 +18,8 @@ class UserDAO(BaseDAO):
         with db_session() as db:
             try:
                 user = self.create(db, user_data)
-                return user
+                user_dict = user.to_dict()
+                return user_dict
             except IntegrityError:
                 # 用户名/手机号重复
                 raise ValueError("用户名或手机号已存在")

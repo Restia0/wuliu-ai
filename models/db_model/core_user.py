@@ -4,6 +4,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from config.database import Base
 
+
 class CoreUser(Base):
     __tablename__ = "core_user"
 
@@ -20,7 +21,12 @@ class CoreUser(Base):
     # 关联关系
     driver_ext = relationship("CoreDriverExt", back_populates="user", uselist=False)
     delivery_tasks = relationship("CoreDeliveryTask", back_populates="driver")
-    created_orders = relationship("CoreOrder", foreign_keys="[CoreOrder.create_user_id]", backref="creator")
+    created_orders = relationship("CoreOrder",
+                                  foreign_keys="[CoreOrder.create_user_id]",
+                                  primaryjoin="CoreUser.id == CoreOrder.create_user_id",
+                                  back_populates="creator",
+                                  lazy="dynamic",
+                                  )
 
     def __repr__(self):
         return f"<CoreUser(id={self.id}, username={self.username}, role={self.role})>"

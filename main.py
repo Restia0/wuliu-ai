@@ -5,6 +5,9 @@ from fastapi.responses import ORJSONResponse
 
 from config.database import init_db
 from config.settings import settings
+from middleware.auth_middleware import auth_middleware
+
+from api.v1.user import router as user_router
 
 
 @asynccontextmanager
@@ -30,6 +33,12 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
 )
 
+# 权限拦截中间件（验证JWT令牌）
+app.middleware("http")(auth_middleware)
+
+# 注册路由
+# 核心业务模块路由
+app.include_router(user_router, prefix="/api/v1/user", tags=["用户与权限管理"])
 
 if __name__ == "__main__":
     import uvicorn
