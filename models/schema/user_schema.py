@@ -45,9 +45,9 @@ class UserInfoResponse(BaseModel):
     real_name: Optional[str]
     create_time: str
 
-    # 支持ORM模型转DTO
+    # 支持模型转DTO
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # 用户信息修改请求模型
