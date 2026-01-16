@@ -35,6 +35,7 @@ class CoreUser(Base):
         return {
             "id": self.id,
             "username": self.username,
+            "password": self.password,
             "role": self.role,
             "phone": self.phone,
             "real_name": self.real_name,
