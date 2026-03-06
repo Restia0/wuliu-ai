@@ -34,9 +34,13 @@ class CoreWarehouse(Base):
         return {
             "id": self.id,
             "warehouse_name": self.warehouse_name,
-            "address": f"{self.province}{self.city}{self.district}{self.address}",
+            "province": self.province,
+            "city": self.city,
+            "district": self.district,
+            "address": self.address,
             "capacity_limit": self.capacity_limit,
             "current_stock": self.current_stock,
             "manager_id": self.manager_id,
-            "create_time": self.create_time.strftime("%Y-%m-%d %H:%M:%S") if self.create_time else None
+            "create_time": self.create_time.strftime("%Y-%m-%d %H:%M:%S") if self.create_time else None,
+            "update_time": self.update_time.strftime("%Y-%m-%d %H:%M:%S") if self.update_time else None,
         }
