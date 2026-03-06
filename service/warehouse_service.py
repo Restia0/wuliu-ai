@@ -69,5 +69,11 @@ class WarehouseService:
         return result
 
 
+<<<<<<< HEAD
+=======
+
+
+
+>>>>>>> origin/master
 # 创建Service实例
 warehouse_service = WarehouseService()
