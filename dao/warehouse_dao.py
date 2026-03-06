@@ -1,3 +1,4 @@
+from dao.user_dao import user_dao
 from models.db_model.core_inbound import CoreInbound
 from models.db_model.core_outbound import CoreOutbound
 from models.db_model.core_warehouse import CoreWarehouse
@@ -54,6 +55,18 @@ class WarehouseDAO(BaseDAO):
             if not warehouse:
                 return None
             warehouse_dict = warehouse.to_dict()
+
+            capacity_limit = warehouse_dict.get("capacity_limit", 0)
+            current_stock = warehouse_dict.get("current_stock", 0)
+
+            if capacity_limit > 0:
+                warehouse_dict["stock_warning"] = current_stock > capacity_limit * 0.8
+            else:
+                warehouse_dict["stock_warning"] = False
+
+            if warehouse_dict.get("manager_id"):
+                manager = user_dao.get_user_by_id(warehouse_dict["manager_id"])
+                warehouse_dict["manager_name"] = manager.get("real_name") if manager else None
             return warehouse_dict
 
     def get_all_valid_warehouses(self) -> list[dict]:
@@ -96,7 +109,7 @@ class WarehouseDAO(BaseDAO):
             offset = (page - 1) * page_size
 
             # 总条数
-            total = db.query(CoreWarehouse).fliter(and_(*conditions)).count()
+            total = db.query(CoreWarehouse).filter(and_(*conditions)).count()
             # 分页数据
             warehouse = db.query(CoreWarehouse).filter(and_(*conditions)).offset(offset).limit(page_size).all()
 
@@ -105,6 +118,11 @@ class WarehouseDAO(BaseDAO):
             for w in warehouse:
                 w_dict = w.to_dict()
                 w_dict["stock_warning"] = w.current_stock > w.capacity_limit * 0.8
+
+                if w_dict.get("manager_id"):
+                    manager = user_dao.get_user_by_id(w_dict["manager_id"])
+                    w_dict["manager_name"] = manager.get("real_name") if manager else None
+
                 result_data.append(w_dict)
 
             return {
@@ -164,7 +182,15 @@ class WarehouseDAO(BaseDAO):
                 success = self.increase_stock(db, inbound_data["warehouse_id"], inbound_data["goods_quantity"])
                 if not success:
                     raise ValueError("库存不足")
-                return inbound.to_dict()
+
+                inbound_dict = inbound.to_dict()
+                warehouse_dict = self.get_warehouse_by_id(inbound_data["warehouse_id"])
+                inbound_dict["operator_name"] = user_dao.get_user_by_id(operator_id).get("real_name")
+                inbound_dict["operate_time"] = inbound_dict.get("inbound_time")
+                inbound_dict["operate_type"] = "inbound"
+                inbound_dict["warehouse_name"] = warehouse_dict.get("warehouse_name")
+
+                return inbound_dict
             except Exception as e:
                 raise ValueError(f"入库失败：{str(e)}")
 
@@ -189,7 +215,15 @@ class WarehouseDAO(BaseDAO):
                 outbound = CoreOutbound(**outbound_data)
                 db.add(outbound)
                 db.flush()
-                return outbound.to_dict()
+
+                outbound_dict = outbound.to_dict()
+                warehouse_dict = self.get_warehouse_by_id(warehouse_id)
+                outbound_dict["operator_name"] = user_dao.get_user_by_id(operator_id).get("real_name")
+                outbound_dict["operate_time"] = outbound_dict.get("outbound_time")
+                outbound_dict["operate_type"] = "outbound"
+                outbound_dict["warehouse_name"] = warehouse_dict.get("warehouse_name")
+
+                return outbound_dict
             except Exception as e:
                 raise ValueError(f"出库失败：{str(e)}")
 
