@@ -4,6 +4,8 @@ from utils.order_utils import generate_order_no
 from sqlalchemy import and_, or_
 from typing import List, Dict, Optional
 
+from utils.warehouse_utils import match_warehouse_by_address
+
 
 class OrderDAO(BaseDAO):
     def __init__(self):
@@ -19,8 +21,11 @@ class OrderDAO(BaseDAO):
         order_data.setdefault("order_no", generate_order_no())
         order_data.setdefault("order_status", "pending")
         order_data.setdefault("is_delete", 0)
-        # TODO
-        order_data["warehouse_id"] = 1  # 先默认为1号仓库，后期在仓库模块时修改为自动匹配同城市仓库
+        # 自动匹配同城市仓库，若同城市无仓库则匹配默认仓库
+        province = order_data.get("sender_province")
+        city = order_data.get("sender_city")
+        warehouse_id = match_warehouse_by_address(province, city)
+        order_data["warehouse_id"] = warehouse_id
 
         with db_session() as db:
             try:
