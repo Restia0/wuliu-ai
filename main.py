@@ -10,6 +10,7 @@ from middleware.auth_middleware import auth_middleware
 from api.v1.user import router as user_router
 from api.v1.order import router as order_router
 from api.v1.warehouse import router as warehouse_router
+from api.v1.delivery import router as delivery_router
 
 
 @asynccontextmanager
@@ -43,6 +44,7 @@ app.middleware("http")(auth_middleware)
 app.include_router(user_router, prefix="/api/v1/user", tags=["用户与权限管理"])
 app.include_router(order_router, prefix="/api/v1/order", tags=["订单管理"])
 app.include_router(warehouse_router, prefix="/api/v1/warehouse", tags=["仓库管理"])
+app.include_router(delivery_router, prefix="/api/v1/delivery", tags=["配送管理"])
 
 if __name__ == "__main__":
     import uvicorn
