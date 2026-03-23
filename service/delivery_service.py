@@ -130,6 +130,27 @@ class DeliveryService:
         """批量更新所有司机效率"""
         delivery_dao.batch_update_efficiency(days)
 
+    def smart_assign_delivery_task(self, order_id: int, assign_user_id: int) -> Optional[dict]:
+        """
+        智能分配配送任务（调用算法+创建任务）
+        :param order_id:订单ID
+        :param assign_user_id:分配人ID（管理员）
+        :return:配送任务信息，失败返回None
+        """
+        # 1. 调用智能分配算法获取最优司机
+        driver_id = delivery_dao.smart_assign_driver(order_id)
+        if not driver_id:
+            raise ValueError("没有找到合适的司机")
+
+        # 2.创建配送任务（复用原有逻辑）
+        task_date = {
+            "order_id": order_id,
+            "driver_id": driver_id,
+            "delivery_notes": "智能分配"
+        }
+
+        return delivery_dao.create_delivery_task(task_date, assign_user_id)
+
 
 
 delivery_service = DeliveryService()

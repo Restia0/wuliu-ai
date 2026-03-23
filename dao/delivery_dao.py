@@ -405,5 +405,50 @@ class DeliveryDAO(BaseDAO):
         if driver_ext:
             driver_ext.efficiency = efficiency
 
+    def smart_assign_driver(self, order_id: int) -> Optional[int]:
+        """
+        智能分配最优司机
+        :param order_id:司机ID
+        :return:推荐的司机ID，无合适司机时返回None
+        """
+        with db_session() as db:
+            # 1. 获取订单信息（重点：收件地址）
+            order = db.query(CoreOrder).filter(CoreOrder.id == order_id).first()
+            if not order:
+                return None
+            # 提取订单收件核心区域（如：上海市/广东省）
+            order_receive_area = f"{order.receiver_province}-{order.receiver_city}"
+
+            # 2. 获取所有有效司机（排除已删除、效率过低的）
+            valid_drivers = db.query(CoreDriverExt).filter(
+                and_(
+                    CoreDriverExt.efficiency >= 60
+                )
+            ).all()
+            if not valid_drivers:
+                return None
+
+            # 3. 算法核心：多维度排序
+            driver_candidates = []
+            for driver in valid_drivers:
+                # 维度1：区域匹配度（0/1，核心权重）
+                area_match = 1 if driver.delivery_area and order_receive_area in driver.delivery_area else 0
+                # 维度2：待完成任务数（越小越优）
+                task_count = driver.task_count
+                # 维度3：效率（越大越优）
+                efficiency = driver.efficiency
+
+                driver_candidates.append({
+                    "driver_id": driver.user_id,
+                    "area_match": area_match,
+                    "task_count": task_count,
+                    "efficiency": efficiency
+                })
+
+            # 4. 排序规则：区域匹配→任务量升序→效率降序
+            driver_candidates.sort(key=lambda x: (-x["area_match"], x["task_count"], -x["efficiency"]))
+
+            return driver_candidates[0]["driver_id"] if driver_candidates else None
+
 
 delivery_dao = DeliveryDAO()

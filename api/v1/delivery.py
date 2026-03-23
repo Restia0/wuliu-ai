@@ -235,3 +235,25 @@ def batch_update_efficiency(request: Request, days: int = 30):
         logger.error(f"批量更新司机效率失败：{str(e)}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="批量更新司机效率失败")
 
+
+@router.post("/task/smart-assign", summary="智能分配配送任务", response_model=DeliveryTaskResponse,
+             dependencies=[Depends(bearer_scheme)])
+def smart_assign_delivery_task(request: Request, order_id: int):
+    """智能分配配送任务"""
+    if request.state.role != "admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="仅管理员可智能分配配送任务")
+
+    try:
+        task_dict = delivery_service.smart_assign_delivery_task(order_id, request.state.user_id)
+        if not task_dict:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="智能分配失败，无合适司机")
+
+        logger.info(f"智能分配配送任务成功：订单ID={order_id} → 司机ID={task_dict['driver_id']}")
+        return task_dict
+
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except Exception as e:
+        logger.error(f"智能分配配送任务失败：{str(e)}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="智能分配配送任务失败")
+
