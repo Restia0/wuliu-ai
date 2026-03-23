@@ -11,6 +11,7 @@ from api.v1.user import router as user_router
 from api.v1.order import router as order_router
 from api.v1.warehouse import router as warehouse_router
 from api.v1.delivery import router as delivery_router
+from middleware.log_middleware import log_middleware
 
 
 @asynccontextmanager
@@ -37,6 +38,8 @@ app = FastAPI(
 )
 
 # 权限拦截中间件（验证JWT令牌）
+# 注意：后注册的先执行
+app.middleware("http")(log_middleware)
 app.middleware("http")(auth_middleware)
 
 # 注册路由
