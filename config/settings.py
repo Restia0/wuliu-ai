@@ -25,9 +25,14 @@ class Settings:
     # MILVUS_COLLECTION = os.getenv("MILVUS_COLLECTION", "logistics_faq")
     # MILVUS_VECTOR_DIM = int(os.getenv("MILVUS_VECTOR_DIM", 768))
     #
-    # # 大模型配置
-    # LLM_MODEL = os.getenv("LLM_MODEL", "llama3")
-    # LLM_BASE_URL = os.getenv("LLM_BASE_URL", "http://localhost:11434")
+    # 大模型配置
+    MODEL_API_KEY = os.getenv("MODEL_API_KEY")
+    MODEL_BASE_URL = os.getenv("MODEL_API_URL")
+
+    # OCR配置
+    ALIBABA_CLOUD_ACCESS_KEY_ID = os.getenv("ALIBABA_CLOUD_ACCESS_KEY_ID")
+    ALIBABA_CLOUD_ACCESS_KEY_SECRET = os.getenv("ALIBABA_CLOUD_ACCESS_KEY_SECRET")
+    ALIBABA_OCR_REGION = os.getenv("ALIBABA_OCR_REGION", "cn-hangzhou")
 
     # JWT配置
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
