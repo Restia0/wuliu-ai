@@ -11,7 +11,6 @@ class AISqlRecord(Base):
     user_id = Column(BIGINT, ForeignKey("core_user.id", ondelete="CASCADE"), nullable=False,
                      comment="操作人ID（仅管理员）")
     natural_language = Column(TEXT, nullable=False, comment="自然语言提问")
-    extract_params = Column(JSON, nullable=True, comment="提取的参数")
     generated_sql = Column(TEXT, nullable=True, comment="生成的SQL")
     query_result = Column(JSON, nullable=True, comment="查询结果")
     call_time = Column(DATETIME, default=func.now(), comment="调用时间")

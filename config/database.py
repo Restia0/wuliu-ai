@@ -113,15 +113,14 @@ def init_db() -> None:
         from models.db_model.ai_model.ai_ocr_record import AIOcrRecord
         from models.db_model.ai_model.ai_faq_knowledge import AIFaqKnowledge
         from models.db_model.ai_model.ai_chat_record import AIChatRecord
-        from models.db_model.ai_model.ai_sql_template import AISqlTemplate
         from models.db_model.ai_model.ai_sql_record import AISqlRecord
         # 系统模块模型
         from models.db_model.system_model.sys_operation_log import SysOperationLog
         from models.db_model.system_model.sys_statistics import SysStatistics
 
         # 创建所有表（如果不存在）
-        Base.metadata.create_all(bind=engine)
-        logger.info("✅ 数据库表结构初始化完成")
+        # Base.metadata.create_all(bind=engine)
+        # logger.info("✅ 数据库表结构初始化完成")
 
         # 可选：执行基础数据插入脚本（如字典数据）
         # init_base_data()
