@@ -26,6 +26,7 @@ class Settings:
     # MILVUS_VECTOR_DIM = int(os.getenv("MILVUS_VECTOR_DIM", 768))
     #
     # 大模型配置
+    MODEL_NAME = os.getenv("MODEL_NAME")
     MODEL_API_KEY = os.getenv("MODEL_API_KEY")
     MODEL_BASE_URL = os.getenv("MODEL_API_URL")
 

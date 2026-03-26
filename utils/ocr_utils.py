@@ -76,7 +76,7 @@ def extract_order_info_with_llm(ocr_text: str) -> dict:
     prompt = SystemPrompt.ORDER_EXTRACT.value
     try:
         response = client.chat.completions.create(
-            model="deepseek-chat",
+            model=settings.MODEL_NAME,
             messages=[
                 {"role": "system", "content": prompt},
                 {"role": "user", "content": f"请从以下货物单据中获取信息，输出为结构化的json格式：{ocr_text}"}
