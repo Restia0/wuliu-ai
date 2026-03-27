@@ -13,6 +13,7 @@ class AISqlRecord(Base):
     natural_language = Column(TEXT, nullable=False, comment="自然语言提问")
     generated_sql = Column(TEXT, nullable=True, comment="生成的SQL")
     query_result = Column(JSON, nullable=True, comment="查询结果")
+    answer = Column(TEXT, nullable=True, comment="答案")
     call_time = Column(DATETIME, default=func.now(), comment="调用时间")
 
     # 关联关系
