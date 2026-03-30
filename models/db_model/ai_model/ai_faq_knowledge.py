@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BIGINT, VARCHAR, TEXT, DATETIME
+from sqlalchemy import Column, BIGINT, VARCHAR, TEXT, DATETIME, INT
 from sqlalchemy.sql import func
 from config.database import Base
 
@@ -11,6 +11,8 @@ class AIFaqKnowledge(Base):
     answer = Column(TEXT, nullable=False, comment="标准答案")
     keywords = Column(VARCHAR(100), nullable=True, comment="关键词（分词后）")
     embedding_vector = Column(TEXT, nullable=True, comment="向量值（768维，JSON字符串）")
+    chunk_content = Column(TEXT, nullable=True, comment="分块内容")
+    chunk_index = Column(INT, default=0, nullable=True, comment="分块索引")
     create_time = Column(DATETIME, default=func.now(), comment="创建时间")
     update_time = Column(DATETIME, default=func.now(), onupdate=func.now(), comment="更新时间")
 
