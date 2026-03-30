@@ -22,17 +22,17 @@ class OrderService:
         order_dict = order_dao.create_order(order_data)
         return order_dict
 
-    def get_order_detail(self, order_id: int, current_user: dict) -> dict | None:
+    def get_order_detail(self, order_no: int, current_user: dict) -> dict | None:
         """
         查询订单详情（权限控制）：
         - 管理员：可查所有订单
         - 司机：仅查自己的订单
         - 普通用户：仅查自己创建的订单
-        :param order_id:
+        :param order_no:
         :param current_user:
         :return:
         """
-        order_dict = order_dao.get_order_by_id(order_id)
+        order_dict = order_dao.get_order_by_no(order_no)
         if not order_dict:
             return None
 

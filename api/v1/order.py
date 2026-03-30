@@ -35,12 +35,12 @@ def create_order(request: Request, order_data: OrderCreateRequest):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="创建订单失败")
 
 
-@router.get("/detail/{order_id}", summary="查询订单详情", response_model=OrderDetailResponse,
+@router.get("/detail/{order_no}", summary="查询订单详情", response_model=OrderDetailResponse,
             dependencies=[Depends(bearer_scheme)])
-def get_order_detail(order_id: int, request: Request):
+def get_order_detail(order_no: int, request: Request):
     """
     查询订单详情（带权限控制）
-    :param order_id:
+    :param order_no:
     :param request:
     :return:
     """
@@ -51,7 +51,7 @@ def get_order_detail(order_id: int, request: Request):
         "username": request.state.username
     }
 
-    order_dict = order_service.get_order_detail(order_id, current_user)
+    order_dict = order_service.get_order_detail(order_no, current_user)
     if not order_dict:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="订单不存在或无权限查看")
     return order_dict

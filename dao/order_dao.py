@@ -49,6 +49,19 @@ class OrderDAO(BaseDAO):
             order_dict = self._order_to_dict(order)
             return order_dict
 
+    def get_order_by_no(self, order_no: str) -> dict | None:
+        """
+        根据订单号查询订单
+        :param order_no:
+        :return:
+        """
+        with db_session() as db:
+            order = self.get_by_conditions(db, {"order_no": order_no, "is_delete": 0})
+            if not order:
+                return None
+            order_dict = self._order_to_dict(order)
+            return order_dict
+
     def query_orders(self, query_params: dict) -> Dict:
         """
         分页查询订单
