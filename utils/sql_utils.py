@@ -82,7 +82,7 @@ def get_sql_agent_executor() -> AgentExecutor:
         model_name=settings.MODEL_NAME,
         openai_api_key=settings.MODEL_API_KEY,
         openai_api_base=settings.MODEL_BASE_URL,
-        temperature=0.1
+        temperature=0.0
     )
     db = get_sql_db()
     agent = create_sql_agent(
