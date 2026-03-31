@@ -111,7 +111,6 @@ def init_db() -> None:
         from models.db_model.core_delivery_track import CoreDeliveryTrack
         # AI模块模型
         from models.db_model.ai_model.ai_ocr_record import AIOcrRecord
-        from models.db_model.ai_model.ai_faq_knowledge import AIFaqKnowledge
         from models.db_model.ai_model.ai_chat_record import AIChatRecord
         from models.db_model.ai_model.ai_sql_record import AISqlRecord
         # 系统模块模型
