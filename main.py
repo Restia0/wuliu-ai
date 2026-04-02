@@ -13,6 +13,7 @@ from api.v1.warehouse import router as warehouse_router
 from api.v1.delivery import router as delivery_router
 from api.v1.ocr import router as ocr_router
 from api.v1.sql import router as sql_router
+from api.v1.faq import router as faq_router
 from middleware.log_middleware import log_middleware
 
 
@@ -52,6 +53,7 @@ app.include_router(warehouse_router, prefix="/api/v1/warehouse", tags=["仓库�
 app.include_router(delivery_router, prefix="/api/v1/delivery", tags=["配送管理"])
 app.include_router(ocr_router, prefix="/api/v1/ocr", tags=["ocr功能"])
 app.include_router(sql_router, prefix="/api/v1/sql", tags=["智能查询"])
+app.include_router(faq_router, prefix="/api/v1/faq", tags=["RAG功能"])
 
 if __name__ == "__main__":
     import uvicorn
