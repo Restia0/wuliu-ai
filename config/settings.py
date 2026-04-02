@@ -20,11 +20,6 @@ class Settings:
     MYSQL_POOL_SIZE = int(os.getenv("MYSQL_POOL_SIZE", 10))
     MYSQL_MAX_OVERFLOW = int(os.getenv("MYSQL_MAX_OVERFLOW", 20))
 
-    # # Milvus配置
-    # MILVUS_URI = os.getenv("MILVUS_URI", "./milvus_demo.db")
-    # MILVUS_COLLECTION = os.getenv("MILVUS_COLLECTION", "logistics_faq")
-    # MILVUS_VECTOR_DIM = int(os.getenv("MILVUS_VECTOR_DIM", 768))
-    #
     # 大模型配置
     MODEL_NAME = os.getenv("MODEL_NAME")
     MODEL_API_KEY = os.getenv("MODEL_API_KEY")
@@ -47,6 +42,13 @@ class Settings:
     # 日志配置
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
     LOG_FILE_PATH = os.getenv("LOG_FILE_PATH", "./logs/app.log")
+
+    # HuggingFace下载磁盘
+    HF_DOWNLOAD_DISK = os.getenv("HUGGING_FACE_DISK")
+    HF_MODEL_NAME = os.getenv("HUGGING_FACE_MODEL_NAME")
+
+    # Chroma数据库配置
+    CHROMA_DATABASE_PATH = os.getenv("CHROMA_DATABASE_PATH")
 
 
 # 创建配置实例
