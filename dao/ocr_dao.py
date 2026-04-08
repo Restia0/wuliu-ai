@@ -87,7 +87,12 @@ class OcrDao(BaseDAO):
 
             # 更新OCR记录关联的订单ID
             with db_session() as db:
-                record = self.update(db, ocr_record_id, {"order_id": order_id})
+                record = self.get_by_id(db, ocr_record_id)
+                if record:
+                    self.update(db, record, {"order_id": order_id})
+                else:
+                    logger.error(f"OCR记录不存在：ocr_record_id={ocr_record_id}")
+                    raise ValueError("OCR记录不存在")
 
             message = "OCR识别成功，已自动创建订单"
 
