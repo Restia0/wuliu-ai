@@ -9,7 +9,7 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from config.settings import settings
-from service.order_service import order_service
+from dao.order_dao import order_dao
 from utils.common_utils import logger
 from utils.prompt_utils import SystemPrompt
 
@@ -95,13 +95,14 @@ def search_logistics_knowledge(question: str) -> str:
 @tool
 def query_order_by_no(order_no: str) -> dict:
     """
-    通过订单 ID 查询订单详细信息。
+    通过订单号查询订单详细信息。订单号（时间戳+随即数组成）示例：17369856001238881的形式
+    当用户希望通过订单号查询订单信息时调用该工具。
     Args:
-        order_no: 订单编号
+        order_no: 订单号
     Returns:
         订单的详细信息（JSON 格式）
     """
-    order = order_service.get_order_detail(order_no)
+    order = order_dao.get_order_by_no(order_no)
     return order if order else "未找到该订单"
 
 
