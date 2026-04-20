@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>智慧物流管理系统 - 登录</title>
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+<div class="auth-container">
+    <div class="auth-banner">
+        <h1>智慧物流管理系统</h1>
+        <p>面向管理员、司机与客户的一体化物流平台</p>
+    </div>
+    <div class="auth-form-card">
+        <h2>登录</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn primary">登录</button>
+        </form>
+        <div class="auth-extra">
+            <a href="register.html">没有账号？去注册</a>
+        </div>
+        <div id="loginError" class="error-msg"></div>
+    </div>
+</div>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>
+

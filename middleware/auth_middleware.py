@@ -15,8 +15,8 @@ async def auth_middleware(request: Request, call_next):
     :return:
     """
     # 无需校验的路径
-    exclude_paths = ["/api/v1/user/register", "/api/v1/user/login", "/health", "/docs", "/openapi.json"]
-    if request.url.path in exclude_paths:
+    exclude_paths = ["/", "/api/v1/user/register", "/api/v1/user/login", "/health", "/docs", "/openapi.json"]
+    if request.url.path in exclude_paths or request.url.path.startswith("/static/") or request.url.path == "/static":
         return await call_next(request)
 
     # 提取令牌（兼容Bearer + token的格式）

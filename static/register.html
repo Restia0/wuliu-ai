@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>智慧物流管理系统 - 注册</title>
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+<div class="auth-container">
+    <div class="auth-banner">
+        <h1>智慧物流管理系统</h1>
+        <p>欢迎加入智慧物流平台</p>
+    </div>
+    <div class="auth-form-card">
+        <h2>注册</h2>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="reg_username">用户名</label>
+                <input type="text" id="reg_username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="reg_password">密码</label>
+                <input type="password" id="reg_password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="reg_phone">手机号（可选）</label>
+                <input type="text" id="reg_phone" name="phone" placeholder="用于联系与通知">
+            </div>
+            <div class="form-group">
+                <label for="reg_real_name">真实姓名（可选）</label>
+                <input type="text" id="reg_real_name" name="real_name">
+            </div>
+            <div class="form-group">
+                <label for="reg_role">角色</label>
+                <select id="reg_role" name="role" required>
+                    <option value="">请选择角色</option>
+                    <option value="customer">客户</option>
+                    <option value="driver">司机</option>
+                    <option value="admin">管理员</option>
+                </select>
+            </div>
+            <button type="submit" class="btn primary">注册并登录</button>
+        </form>
+        <div class="auth-extra">
+            <a href="index.html">已有账号？去登录</a>
+        </div>
+        <div id="registerError" class="error-msg"></div>
+    </div>
+</div>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>
+

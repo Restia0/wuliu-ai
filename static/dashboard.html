@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>智慧物流管理系统 - 控制台</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="logo">智慧物流</div>
+        <div class="user-info">
+            <div id="sidebarUsername"></div>
+            <div id="sidebarRole" class="role-tag"></div>
+        </div>
+        <nav class="menu">
+            <button class="menu-item" data-target="section-overview">总览</button>
+            <button class="menu-item" data-target="section-orders">订单管理</button>
+            <button class="menu-item" data-target="section-warehouse" data-roles="admin,driver,customer">仓库管理</button>
+            <button class="menu-item" data-target="section-delivery" data-roles="admin,driver,customer">配送管理</button>
+            <button class="menu-item" data-target="section-ocr" data-roles="admin">OCR识别</button>
+            <button class="menu-item" data-target="section-sql" data-roles="admin">智能SQL</button>
+            <button class="menu-item" data-target="section-faq" data-roles="admin,driver,customer">RAG客服</button>
+            <button class="menu-item" data-target="section-profile">个人中心</button>
+        </nav>
+        <button id="logoutBtn" class="btn logout">退出登录</button>
+    </aside>
+    <main class="content">
+        <section id="section-overview" class="content-section active">
+            <h1>系统总览</h1>
+            <p>根据您的角色，您可以在左侧导航中进入不同的功能模块。</p>
+            <ul class="overview-list">
+                <li><strong>客户</strong>：创建与查询订单。</li>
+                <li><strong>司机</strong>：查看配送任务、更新任务状态、上报配送轨迹。</li>
+                <li><strong>管理员</strong>：管理订单、仓库、配送任务以及司机效率等。</li>
+            </ul>
+        </section>
+
+        <section id="section-orders" class="content-section">
+            <h1>订单管理</h1>
+            <div class="panel" data-roles="admin,driver,customer">
+                <h2>创建订单（客户）</h2>
+                <form id="orderCreateForm" class="grid-form">
+                    <div class="form-group">
+                        <label>发件人姓名</label>
+                        <input name="sender_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>发件人手机号</label>
+                        <input name="sender_phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label>发件省</label>
+                        <input name="sender_province" required>
+                    </div>
+                    <div class="form-group">
+                        <label>发件市</label>
+                        <input name="sender_city" required>
+                    </div>
+                    <div class="form-group">
+                        <label>发件区/县</label>
+                        <input name="sender_district" required>
+                    </div>
+                    <div class="form-group">
+                        <label>发件详细地址</label>
+                        <input name="sender_address" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>收件人姓名</label>
+                        <input name="receiver_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>收件人手机号</label>
+                        <input name="receiver_phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label>收件省</label>
+                        <input name="receiver_province" required>
+                    </div>
+                    <div class="form-group">
+                        <label>收件市</label>
+                        <input name="receiver_city" required>
+                    </div>
+                    <div class="form-group">
+                        <label>收件区/县</label>
+                        <input name="receiver_district" required>
+                    </div>
+                    <div class="form-group">
+                        <label>收件详细地址</label>
+                        <input name="receiver_address" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>货物类型</label>
+                        <input name="goods_type" placeholder="如：普通、易碎、大件">
+                    </div>
+                    <div class="form-group">
+                        <label>货物数量</label>
+                        <input name="goods_quantity" type="number" min="1" value="1">
+                    </div>
+                    <button type="submit" class="btn primary">创建订单</button>
+                </form>
+                <div id="orderCreateMsg" class="hint-msg"></div>
+            </div>
+
+            <div class="panel">
+                <h2>订单列表</h2>
+                <form id="orderQueryForm" class="inline-form">
+                    <input name="order_no" placeholder="订单号">
+                    <select name="order_status">
+                        <option value="">全部状态</option>
+                        <option value="pending">待发货</option>
+                        <option value="delivering">配送中</option>
+                        <option value="signed">已签收</option>
+                        <option value="cancelled">已取消</option>
+                    </select>
+                    <button class="btn secondary" type="submit">查询</button>
+                </form>
+                <table class="data-table" id="orderTable">
+                    <thead>
+                    <tr>
+                        <th>订单号</th>
+                        <th>收件人</th>
+                        <th>手机号</th>
+                        <th>地址</th>
+                        <th>状态</th>
+                        <th>司机ID</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="panel">
+                <h2>订单详情（按订单号）</h2>
+                <form id="orderDetailForm" class="inline-form">
+                    <input name="order_no" type="number" placeholder="订单号" required>
+                    <button class="btn secondary" type="submit">查询详情</button>
+                </form>
+                <div id="orderDetailResult" class="detail-cards"></div>
+            </div>
+
+            <div class="panel" data-roles="admin">
+                <h2>修改订单状态（管理员）</h2>
+                <form id="orderStatusForm" class="grid-form">
+                    <div class="form-group">
+                        <label>订单ID</label>
+                        <input name="order_id" type="number" required>
+                    </div>
+                    <div class="form-group">
+                        <label>订单状态</label>
+                        <select name="order_status" required>
+                            <option value="pending">待发货（pending）</option>
+                            <option value="delivering">配送中（delivering）</option>
+                            <option value="signed">已签收（signed）</option>
+                            <option value="cancelled">已取消（cancelled）</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="orderStatusDriverGroup">
+                        <label>司机ID（配送中必填）</label>
+                        <input name="driver_id" type="number" placeholder="可选（delivery中必填）">
+                    </div>
+                    <button class="btn primary" type="submit">更新状态</button>
+                </form>
+                <div id="orderStatusMsg" class="hint-msg"></div>
+            </div>
+        </section>
+
+        <section id="section-warehouse" class="content-section">
+            <h1>仓库管理</h1>
+
+            <div class="panel">
+                <h2>库存查询（支持预警筛选）</h2>
+                <form id="stockQueryForm" class="inline-form">
+                    <input name="warehouse_id" type="number" placeholder="仓库ID（可选）">
+                    <label class="check-inline">
+                        <input type="checkbox" name="warning_only" id="warningOnlyInput">
+                        仅预警仓库
+                    </label>
+                    <input name="page" type="number" min="1" value="1" required>
+                    <input name="page_size" type="number" min="1" max="50" value="10" required>
+                    <button class="btn secondary" type="submit">查询库存</button>
+                </form>
+                <table class="data-table" id="stockTable">
+                    <thead>
+                    <tr>
+                        <th>仓库ID</th>
+                        <th>仓库名称</th>
+                        <th>当前库存</th>
+                        <th>容量上限</th>
+                        <th>是否预警</th>
+                        <th>管理员</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="panel">
+                <h2>仓库详情（按ID）</h2>
+                <form id="warehouseDetailForm" class="inline-form">
+                    <input name="warehouse_id" type="number" placeholder="仓库ID" required>
+                    <button class="btn secondary" type="submit">查询详情</button>
+                </form>
+                <div id="warehouseDetailResult" class="detail-cards"></div>
+            </div>
+
+            <div class="panel" data-roles="admin">
+                <h2>创建仓库</h2>
+                <form id="warehouseCreateForm" class="grid-form">
+                    <div class="form-group">
+                        <label>仓库名称</label>
+                        <input name="warehouse_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>省</label>
+                        <input name="province">
+                    </div>
+                    <div class="form-group">
+                        <label>市</label>
+                        <input name="city">
+                    </div>
+                    <div class="form-group">
+                        <label>区/县</label>
+                        <input name="district">
+                    </div>
+                    <div class="form-group">
+                        <label>详细地址</label>
+                        <input name="address">
+                    </div>
+                    <div class="form-group">
+                        <label>容量上限（件）</label>
+                        <input name="capacity_limit" type="number" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>仓库管理员ID（可选）</label>
+                        <input name="manager_id" type="number">
+                    </div>
+                    <button type="submit" class="btn primary">创建仓库</button>
+                </form>
+                <div id="warehouseCreateMsg" class="hint-msg"></div>
+            </div>
+
+            <div class="panel" data-roles="admin">
+                <h2>修改仓库</h2>
+                <form id="warehouseUpdateForm" class="grid-form">
+                    <div class="form-group">
+                        <label>仓库ID</label>
+                        <input name="id" type="number" required>
+                    </div>
+                    <div class="form-group">
+                        <label>仓库名称</label>
+                        <input name="warehouse_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>省</label>
+                        <input name="province">
+                    </div>
+                    <div class="form-group">
+                        <label>市</label>
+                        <input name="city">
+                    </div>
+                    <div class="form-group">
+                        <label>区/县</label>
+                        <input name="district">
+                    </div>
+                    <div class="form-group">
+                        <label>详细地址</label>
+                        <input name="address">
+                    </div>
+                    <div class="form-group">
+                        <label>容量上限（件）</label>
+                        <input name="capacity_limit" type="number" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>仓库管理员ID（可选）</label>
+                        <input name="manager_id" type="number">
+                    </div>
+                    <button type="submit" class="btn primary">更新仓库</button>
+                </form>
+                <div id="warehouseUpdateMsg" class="hint-msg"></div>
+            </div>
+
+            <div class="panel" data-roles="admin">
+                <h2>入库操作</h2>
+                <form id="warehouseInboundForm" class="grid-form">
+                    <div class="form-group">
+                        <label>仓库ID</label>
+                        <input name="warehouse_id" type="number" required>
+                    </div>
+                    <div class="form-group">
+                        <label>关联订单ID（可选）</label>
+                        <input name="order_id" type="number">
+                    </div>
+                    <div class="form-group">
+                        <label>货物类型（可选）</label>
+                        <input name="goods_type">
+                    </div>
+                    <div class="form-group">
+                        <label>入库数量</label>
+                        <input name="goods_quantity" type="number" min="1" required>
+                    </div>
+                    <button type="submit" class="btn primary">入库</button>
+                </form>
+                <div id="warehouseInboundMsg" class="hint-msg"></div>
+            </div>
+
+            <div class="panel" data-roles="admin">
+                <h2>出库操作</h2>
+                <form id="warehouseOutboundForm" class="grid-form">
+                    <div class="form-group">
+                        <label>仓库ID</label>
+                        <input name="warehouse_id" type="number" required>
+                    </div>
+                    <div class="form-group">
+                        <label>关联订单ID（可选）</label>
+                        <input name="order_id" type="number">
+                    </div>
+                    <div class="form-group">
+                        <label>货物类型（可选）</label>
+                        <input name="goods_type">
+                    </div>
+                    <div class="form-group">
+                        <label>出库数量</label>
+                        <input name="goods_quantity" type="number" min="1" required>
+                    </div>
+                    <button type="submit" class="btn primary">出库</button>
+                </form>
+                <div id="warehouseOutboundMsg" class="hint-msg"></div>
+            </div>
+        </section>
+
+        <section id="section-delivery" class="content-section">
+            <h1>配送管理</h1>
+
+            <div class="panel" data-roles="admin,driver">
+                <h2>配送任务查询</h2>
+                <form id="deliveryTaskQueryForm" class="inline-form">
+                    <input name="order_no" placeholder="订单号（可选）">
+                    <select name="task_status">
+                        <option value="">全部状态</option>
+                        <option value="pending">pending</option>
+                        <option value="delivering">delivering</option>
+                        <option value="completed">completed</option>
+                        <option value="cancelled">cancelled</option>
+                    </select>
+                    <input name="page" type="number" min="1" value="1" required>
+                    <input name="page_size" type="number" min="1" max="50" value="10" required>
+                    <button class="btn secondary" type="submit">查询任务</button>
+                </form>
+
+                <table class="data-table" id="deliveryTaskTable">
+                    <thead>
+                    <tr>
+                        <th>任务ID</th>
+                        <th>订单号</th>
+                        <th>订单ID</th>
+                        <th>司机ID</th>
+                        <th>司机姓名</th>
+                        <th>状态</th>
+                        <th>配送备注</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="panel" data-roles="admin">
+                <h2>分配配送任务（管理员）</h2>
+                <form id="deliveryTaskAssignForm" class="inline-form">
+                    <input name="order_id" type="number" placeholder="订单ID" required>
+                    <input name="driver_id" type="number" placeholder="司机用户ID" required>
+                    <button class="btn primary" type="submit">分配任务</button>
+                </form>
+                <div id="deliveryTaskAssignMsg" class="hint-msg"></div>
+            </div>
+
+            <div class="panel" data-roles="admin,driver">
+                <h2>更新任务状态</h2>
+                <form id="deliveryTaskStatusForm" class="grid-form">
+                    <div class="form-group">
+                        <label>任务ID</label>
+                        <input name="task_id" type="number" required>
+                    </div>
+                    <div class="form-group">
+                        <label>任务状态</label>
+                        <select name="task_status" required>
+                            <option value="pending">pending</option>
+                            <option value="delivering">delivering</option>
+                            <option value="completed">completed</option>
+                            <option value="cancelled">cancelled</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>轨迹节点（必填）</label>
+                        <select name="track_node" required>
+                            <option value="已取货">已取货</option>
+                            <option value="运输中">运输中</option>
+                            <option value="已送达">已送达</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>轨迹地址（可选）</label>
+                        <input name="track_address" placeholder="例如：XXX小区/仓库" maxlength="200">
+                    </div>
+                    <button class="btn primary" type="submit">更新任务状态</button>
+                </form>
+                <div id="deliveryTaskStatusMsg" class="hint-msg"></div>
+            </div>
+
+            <div class="panel" data-roles="driver">
+                <h2>创建配送轨迹（独立接口）</h2>
+                <form id="deliveryTrackCreateForm" class="grid-form">
+                    <div class="form-group">
+                        <label>任务ID</label>
+                        <input name="task_id" type="number" required>
+                    </div>
+                    <div class="form-group">
+                        <label>轨迹节点</label>
+                        <select name="track_node" required>
+                            <option value="已取货" selected>已取货</option>
+                            <option value="运输中">运输中</option>
+                            <option value="已送达">已送达</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>轨迹地址（可选）</label>
+                        <input name="track_address" placeholder="例如：到达配送点" maxlength="200">
+                    </div>
+                    <button class="btn primary" type="submit">创建轨迹</button>
+                </form>
+                <div id="deliveryTrackCreateMsg" class="hint-msg"></div>
+            </div>
+
+            <div class="panel" data-roles="admin,driver">
+                <h2>查询配送轨迹</h2>
+                <form id="deliveryTrackQueryForm" class="inline-form">
+                    <input name="task_id" type="number" placeholder="任务ID" required>
+                    <button class="btn secondary" type="submit">查询轨迹</button>
+                </form>
+                <div id="deliveryTrackResult" class="detail-cards"></div>
+            </div>
+
+            <div class="panel" data-roles="admin">
+                <h2>批量更新司机效率</h2>
+                <form id="driverEfficiencyBatchForm" class="inline-form">
+                    <input name="days" type="number" min="1" value="30" required>
+                    <button class="btn secondary" type="submit">更新效率</button>
+                </form>
+                <div id="driverEfficiencyBatchMsg" class="hint-msg"></div>
+            </div>
+
+            <div class="panel" data-roles="admin">
+                <h2>智能分配配送任务</h2>
+                <form id="smartAssignForm" class="inline-form">
+                    <input name="order_id" type="number" placeholder="订单ID" required>
+                    <button class="btn primary" type="submit">智能分配</button>
+                </form>
+                <div id="smartAssignMsg" class="hint-msg"></div>
+            </div>
+
+            <div class="panel" data-roles="admin,driver,customer">
+                <h2>司机扩展信息查询</h2>
+                <form id="driverExtQueryForm" class="inline-form">
+                    <input name="user_id" type="number" placeholder="司机用户ID（可选）">
+                    <button class="btn secondary" type="submit">查询扩展信息</button>
+                </form>
+                <div id="driverExtQueryResult" class="detail-cards"></div>
+            </div>
+
+            <div class="panel" data-roles="admin">
+                <h2>创建司机扩展信息</h2>
+                <form id="driverExtCreateForm" class="grid-form">
+                    <div class="form-group">
+                        <label>司机用户ID</label>
+                        <input name="user_id" type="number" required>
+                    </div>
+                    <div class="form-group">
+                        <label>车牌号</label>
+                        <input name="car_no" required placeholder="例如：沪A12345">
+                    </div>
+                    <div class="form-group">
+                        <label>常配送区域（可选）</label>
+                        <input name="delivery_area" placeholder="例如：上海-浦东">
+                    </div>
+                    <button class="btn primary" type="submit">创建扩展信息</button>
+                </form>
+                <div id="driverExtCreateMsg" class="hint-msg"></div>
+            </div>
+
+            <div class="panel" data-roles="admin,driver">
+                <h2>修改司机扩展信息</h2>
+                <form id="driverExtUpdateForm" class="grid-form">
+                    <div class="form-group">
+                        <label>扩展ID（id）</label>
+                        <input name="id" type="number" required>
+                    </div>
+                    <div class="form-group">
+                        <label>司机用户ID（user_id）</label>
+                        <input name="user_id" type="number" required>
+                    </div>
+                    <div class="form-group">
+                        <label>车牌号</label>
+                        <input name="car_no" required placeholder="例如：沪A12345">
+                    </div>
+                    <div class="form-group">
+                        <label>常配送区域（可选）</label>
+                        <input name="delivery_area" placeholder="例如：上海-浦东">
+                    </div>
+                    <button class="btn primary" type="submit">更新扩展信息</button>
+                </form>
+                <div id="driverExtUpdateMsg" class="hint-msg"></div>
+            </div>
+        </section>
+
+        <section id="section-ocr" class="content-section" data-roles="admin">
+            <h1>OCR识别</h1>
+
+            <div class="panel" data-roles="admin">
+                <h2>上传PDF并OCR识别（仅管理员）</h2>
+                <form id="ocrRecognizeForm" class="grid-form" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>选择PDF文件</label>
+                        <input name="file" type="file" accept="application/pdf" required>
+                    </div>
+                    <button class="btn primary" type="submit">开始识别</button>
+                </form>
+                <div id="ocrRecognizeMsg" class="hint-msg"></div>
+                <pre id="ocrRecognizeResult" class="result-box"></pre>
+            </div>
+
+            <div class="panel" data-roles="admin">
+                <h2>查询OCR识别记录</h2>
+                <form id="ocrRecordQueryForm" class="inline-form">
+                    <input name="record_id" type="number" placeholder="OCR记录ID" required>
+                    <button class="btn secondary" type="submit">查询记录</button>
+                </form>
+                <div id="ocrRecordResult" class="detail-cards"></div>
+            </div>
+        </section>
+
+        <section id="section-sql" class="content-section" data-roles="admin">
+            <h1>智能SQL</h1>
+
+            <div class="panel" data-roles="admin">
+                <h2>自然语言查询（管理员）</h2>
+                <form id="sqlAgentForm" class="grid-form">
+                    <div class="form-group full-row">
+                        <label>输入问题</label>
+                        <textarea name="question" rows="4" required placeholder="例如：查询某个仓库的库存情况"></textarea>
+                    </div>
+                    <button class="btn primary" type="submit">生成SQL并查询</button>
+                </form>
+                <div id="sqlAgentMsg" class="hint-msg"></div>
+                <div id="sqlAgentResult" class="result-box"></div>
+            </div>
+        </section>
+
+        <section id="section-faq" class="content-section" data-roles="admin,driver,customer">
+            <h1>RAG客服</h1>
+
+            <div class="panel">
+                <h2>AI对话</h2>
+                <form id="faqChatForm" class="grid-form">
+                    <div class="form-group full-row">
+                        <label>问题</label>
+                        <textarea name="question" rows="3" placeholder="请输入要咨询的问题" required></textarea>
+                    </div>
+                    <button class="btn primary" type="submit">发送</button>
+                </form>
+                <div id="faqChatHistory" class="chat-history"></div>
+            </div>
+
+            <div class="panel" data-roles="admin">
+                <h2>管理员上传PDF（知识库）</h2>
+                <form id="faqAdminUploadForm" class="grid-form" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>选择PDF文件</label>
+                        <input name="file" type="file" accept="application/pdf" required>
+                    </div>
+                    <button class="btn primary" type="submit">上传并切片</button>
+                </form>
+                <div id="faqAdminUploadMsg" class="hint-msg"></div>
+                <pre id="faqAdminUploadResult" class="result-box"></pre>
+            </div>
+        </section>
+
+        <section id="section-profile" class="content-section">
+            <h1>个人中心</h1>
+            <div class="panel">
+                <h2>基本信息</h2>
+                <div id="profileInfo"></div>
+            </div>
+
+            <div class="panel">
+                <h2>修改个人信息</h2>
+                <form id="updateUserInfoForm" class="grid-form">
+                    <div class="form-group">
+                        <label>手机号（可选）</label>
+                        <input name="phone" placeholder="例如：138xxxxxxx">
+                    </div>
+                    <div class="form-group">
+                        <label>真实姓名（可选）</label>
+                        <input name="real_name" placeholder="例如：张三">
+                    </div>
+                    <button class="btn primary" type="submit">保存修改</button>
+                </form>
+                <div id="updateUserInfoMsg" class="hint-msg"></div>
+            </div>
+
+            <div class="panel">
+                <h2>重置密码</h2>
+                <form id="resetPasswordForm" class="grid-form">
+                    <div class="form-group">
+                        <label>旧密码</label>
+                        <input name="old_password" type="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>新密码</label>
+                        <input name="new_password" type="password" required>
+                    </div>
+                    <button class="btn primary" type="submit">重置</button>
+                </form>
+                <div id="resetPasswordMsg" class="hint-msg"></div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>
+

@@ -1,7 +1,8 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, APIRouter
-from fastapi.responses import ORJSONResponse
+from fastapi.responses import ORJSONResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 
 from config.database import init_db
 from config.settings import settings
@@ -44,6 +45,14 @@ app = FastAPI(
 # 注意：后注册的先执行
 app.middleware("http")(log_middleware)
 app.middleware("http")(auth_middleware)
+
+# 静态资源：前端页面/JS/CSS/图片（全部由 FastAPI 提供）
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/", include_in_schema=False)
+def root():
+    # 便于直接访问主地址：/ -> /static/index.html
+    return RedirectResponse(url="/static/index.html")
 
 # 注册路由
 # 核心业务模块路由
